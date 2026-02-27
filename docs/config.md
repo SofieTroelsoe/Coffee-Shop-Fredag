@@ -35,6 +35,20 @@ Typical fields:
 Top-level config wrapper. Currently contains:
 
 - `mqtt: MqttConfig`
+- `mqtt_configs: dict[str, MqttConfig]` for all active MQTT profiles
+- `simulation: SimulationConfig | None` for notebook simulation defaults
+
+
+### `SimulationConfig`
+
+Phase 2 weather-agent defaults live under `simulation` in `config.yaml`.
+
+Useful fields:
+
+- `timestep_minutes`
+- `start_time`
+- `weather_agent.topic_suffix`
+- `weather_agent.publish_interval_s`
 
 
 ## Functions
@@ -61,6 +75,10 @@ from simulated_city.config import load_config
 cfg = load_config()
 print(cfg.mqtt.host, cfg.mqtt.port, cfg.mqtt.tls)
 print("base topic:", cfg.mqtt.base_topic)
+
+if cfg.simulation:
+   print("weather topic suffix:", cfg.simulation.weather_agent.topic_suffix)
+   print("publish interval (s):", cfg.simulation.weather_agent.publish_interval_s)
 ```
 
 

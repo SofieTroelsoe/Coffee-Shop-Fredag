@@ -125,3 +125,32 @@ def test_load_config_single_broker_with_active_profiles(tmp_path) -> None:
     # Only local broker in configs
     assert "local" in cfg.mqtt_configs
     assert len(cfg.mqtt_configs) == 1
+
+
+def test_load_config_reads_weather_agent_defaults(tmp_path) -> None:
+    """Test weather-agent topic and interval settings from simulation config."""
+    p = tmp_path / "config.yaml"
+    p.write_text(
+        """
+mqtt:
+  active_profiles: [local]
+  profiles:
+    local:
+      host: localhost
+      port: 1883
+      tls: false
+simulation:
+  timestep_minutes: 10
+  weather_agent:
+    topic_suffix: weather-updates
+    publish_interval_s: 2.5
+        """.strip(),
+        encoding="utf-8",
+    )
+
+    cfg = load_config(p)
+
+    assert cfg.simulation is not None
+    assert cfg.simulation.timestep_minutes == 10
+    assert cfg.simulation.weather_agent.topic_suffix == "weather-updates"
+    assert cfg.simulation.weather_agent.publish_interval_s == 2.5

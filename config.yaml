@@ -14,7 +14,8 @@ mqtt:
   # 
 
   # The first profile in the list is the primary (default) broker.
-  active_profiles: [local, hivemq_cloud]
+  # Phase 2 keeps development local-only for deterministic workshop setup.
+  active_profiles: [local]
 
   # Broker profiles.
   # Profile values override any common mqtt.* settings below.
@@ -54,6 +55,18 @@ mqtt:
 
   # Topic defaults (projects can change these)
   base_topic: "simulated-city"
+
+simulation:
+  # Logical simulation step for generated timestamps.
+  timestep_minutes: 15
+
+  # Optional deterministic start time for repeatable notebook output.
+  start_time: "2026-02-27T08:00:00Z"
+
+  # First agent defaults for Phase 2.
+  weather_agent:
+    topic_suffix: "weather"
+    publish_interval_s: 5.0
 
 # EXAMPLE: To use multiple MQTT brokers simultaneously, uncomment and edit above.
 # Replace the single "profile: local" line with:

@@ -37,6 +37,12 @@ class SimulationLocationConfig:
 
 
 @dataclass(frozen=True, slots=True)
+class WeatherAgentConfig:
+    topic_suffix: str = "weather"
+    publish_interval_s: float = 5.0
+
+
+@dataclass(frozen=True, slots=True)
 class SimulationConfig:
     """Configuration for the rubbish-bin simulation.
 
@@ -59,6 +65,7 @@ class SimulationConfig:
     start_time: datetime | None = None
     seed: int | None = None
     locations: tuple[SimulationLocationConfig, ...] = ()
+    weather_agent: WeatherAgentConfig = field(default_factory=WeatherAgentConfig)
 
 
 def _parse_utc_datetime(value: Any) -> datetime:
@@ -327,6 +334,17 @@ def _parse_simulation_config(raw: Any) -> SimulationConfig | None:
 
         locations.append(SimulationLocationConfig(location_id=location_id, lat=lat, lon=lon))
 
+    weather_agent_raw = raw.get("weather_agent") or {}
+    if not isinstance(weather_agent_raw, dict):
+        raise ValueError("Config key 'simulation.weather_agent' must be a mapping")
+
+    topic_suffix = str(weather_agent_raw.get("topic_suffix") or "weather").strip() or "weather"
+
+    publish_interval_raw = weather_agent_raw.get("publish_interval_s")
+    if publish_interval_raw is None:
+        publish_interval_raw = weather_agent_raw.get("interval_s")
+    publish_interval_s = float(publish_interval_raw) if publish_interval_raw is not None else 5.0
+
     return SimulationConfig(
         timestep_minutes=timestep_minutes,
         arrival_prob=arrival_prob,
@@ -337,6 +355,10 @@ def _parse_simulation_config(raw: Any) -> SimulationConfig | None:
         start_time=start_time,
         seed=seed,
         locations=tuple(locations),
+        weather_agent=WeatherAgentConfig(
+            topic_suffix=topic_suffix,
+            publish_interval_s=publish_interval_s,
+        ),
     )
 
 
