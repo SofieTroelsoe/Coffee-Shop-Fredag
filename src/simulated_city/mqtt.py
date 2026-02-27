@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import socket
 import ssl
@@ -88,6 +89,46 @@ class MqttPublisher:
         if qos > 0:
             result.wait_for_publish()
         return result
+
+
+def connect_mqtt(mqtt_config: MqttConfig, *, client_id_suffix: str | None = None, timeout_s: float = 10.0):
+    """Connect to MQTT and return a connected paho client.
+
+    This is a beginner-friendly wrapper around ``MqttConnector``.
+    """
+
+    connector = MqttConnector(mqtt_config, client_id_suffix=client_id_suffix)
+    connector.connect()
+
+    if not connector.wait_for_connection(timeout=timeout_s):
+        connector.disconnect()
+        raise RuntimeError(
+            f"Failed to connect to MQTT broker at {mqtt_config.host}:{mqtt_config.port}"
+        )
+
+    # Keep a reference so callers can optionally close via
+    # ``client._simcity_connector.disconnect()`` in notebooks.
+    setattr(connector.client, "_simcity_connector", connector)
+    return connector.client
+
+
+def publish_json_checked(client, topic: str, data: dict, *, qos: int = 1, retain: bool = False, timeout_s: float = 5.0):
+    """Publish JSON and verify broker accepted the message.
+
+    Raises ``RuntimeError`` when publish fails.
+    """
+
+    payload = json.dumps(data)
+    info = client.publish(topic, payload=payload, qos=qos, retain=retain)
+
+    if info.rc != 0:
+        raise RuntimeError(f"MQTT publish failed (rc={info.rc}) for topic '{topic}'")
+
+    info.wait_for_publish(timeout=timeout_s)
+    if not info.is_published():
+        raise RuntimeError(f"MQTT publish timed out for topic '{topic}'")
+
+    return info
 
 
 def _make_client_id(prefix: str, suffix: str | None) -> str:

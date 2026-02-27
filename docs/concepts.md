@@ -97,6 +97,35 @@ Assumed base topic from config: `simulated-city`.
 
 ---
 
+## Phase 4 Topic Contract (Weather -> People)
+
+Phase 4 implementation uses this explicit contract between the two running agents:
+
+- Weather publishes to `simulated-city/weather`
+- People/Transport subscribes to `simulated-city/weather`
+- People/Transport publishes derived state to `simulated-city/people/state`
+
+### Weather input schema used by People agent
+
+- `agent` (expected: `weather`)
+- `tick` (integer simulation step)
+- `timestamp` (ISO-8601 string)
+- `condition` (`clear` or `rain`)
+- `temperature_c` (number)
+
+### Derived People output schema
+
+- `agent` (fixed: `people`)
+- `timestamp` (ISO-8601 string)
+- `source_weather_tick` (integer from input)
+- `source_condition` (copied weather condition)
+- `movement_mode` (`random_walk` for clear, `to_coffee_shops` for rain)
+- `active_people` (fixed starter count: 5)
+
+This keeps message compatibility explicit before adding additional agents.
+
+---
+
 ## 3) Configuration Parameters to Define
 
 ## MQTT/Broker

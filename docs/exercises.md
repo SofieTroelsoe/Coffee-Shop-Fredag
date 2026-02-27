@@ -171,6 +171,27 @@ while True:
     time.sleep(1)
 ```
 
+## Exercise 4: Two-Agent Run Order (Weather + People)
+
+Use these notebooks together:
+
+- `notebooks/agent_weather.ipynb`
+- `notebooks/agent_people.ipynb`
+
+Run order:
+
+1. Start `agent_people.ipynb` first and run the subscribe cell, then the loop cell.
+2. Start `agent_weather.ipynb` and run its publish cell.
+3. Confirm `agent_people.ipynb` logs weather messages and publishes derived people state.
+
+Phase 4 topic contract:
+
+- Weather publish topic: `{base_topic}/weather`
+- People subscribe topic: `{base_topic}/weather`
+- People derived publish topic: `{base_topic}/people/state`
+
+This verifies that the second agent consumes weather input and republishes derived output through MQTT.
+
 ## Checklist Before Submitting
 
 - [ ] Each agent is a **separate notebook** (not one giant file)

@@ -32,21 +32,7 @@ This phased plan follows your clarified design in [docs/concepts.md](docs/concep
 - Dependencies
   - No new package expected (PyYAML and python-dotenv already present in [pyproject.toml](pyproject.toml))
 
-**Phase 3: Add MQTT publishing from first agent**
-- New files
-  - Update [src/simulated_city/mqtt.py](src/simulated_city/mqtt.py) with helper wrappers (connect_mqtt, publish_json_checked) while preserving existing class API
-  - Update notebook from Phase 1 to publish JSON messages to configured topic
-  - Update MQTT docs in [docs/mqtt.md](docs/mqtt.md) and/or exercise flow in [docs/exercises.md](docs/exercises.md)
-- Tests/Verification
-  - python -m pytest tests/test_smoke.py -v
-  - python -m pytest tests/test_mqtt_profiles.py -v
-  - python scripts/validate_structure.py
-  - Manual: subscribe with a temporary client and verify messages arrive on the expected topic
-- Investigation before next phase
-  - Confirm publish acknowledgment/verification behavior expectations for workshop reliability
-  - Confirm fallback behavior when broker unavailable (retry vs fail-fast for teaching context)
-- Dependencies
-  - No new package expected (paho-mqtt already present)
+**Phase 3: 
 
 **Phase 4: Add second agent with MQTT subscription (People/Transport)**
 - New files

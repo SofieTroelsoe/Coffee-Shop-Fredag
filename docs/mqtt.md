@@ -6,6 +6,8 @@ This document covers everything in `simulated_city.mqtt`:
 
 - `MqttConnector`
 - `MqttPublisher`
+- `connect_mqtt`
+- `publish_json_checked`
 
 ## Quick Start: Using Multiple Brokers
 
@@ -97,6 +99,27 @@ publisher.publish_json("simulated-city/metrics", '{"step": 1, "agents": 25}')
 time.sleep(1) # Give time for message to be sent
 connector.disconnect()
 ```
+
+## Helper wrappers for notebooks
+
+For workshop notebooks, use the helper wrappers for simple and verified publishing:
+
+```python
+from simulated_city.config import load_config
+from simulated_city import mqtt
+
+cfg = load_config()
+topic = f"{cfg.mqtt.base_topic}/weather"
+
+client = mqtt.connect_mqtt(cfg.mqtt)
+mqtt.publish_json_checked(client, topic, {"agent": "weather", "tick": 1})
+
+# Optional cleanup in notebooks
+client._simcity_connector.disconnect()
+```
+
+`publish_json_checked(...)` waits for publish completion and raises an error if
+the broker does not accept or complete the publish.
 
 Notes:
 

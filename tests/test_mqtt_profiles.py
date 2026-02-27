@@ -43,9 +43,15 @@ def get_required_credentials_from_yaml(yaml_path: str = "config.yaml") -> dict[s
     
     mqtt = data.get("mqtt") or {}
     profiles = mqtt.get("profiles") or {}
+    active_profiles = mqtt.get("active_profiles") or []
+    if not isinstance(active_profiles, list):
+        active_profiles = [active_profiles]
+    active_profile_set = {str(name) for name in active_profiles if name}
     
     required = {}
     for profile_name, profile_config in profiles.items():
+        if active_profile_set and profile_name not in active_profile_set:
+            continue
         if not isinstance(profile_config, dict):
             continue
         env_vars = []
